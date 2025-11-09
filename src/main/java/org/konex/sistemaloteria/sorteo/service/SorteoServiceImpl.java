@@ -1,57 +1,115 @@
 package org.konex.sistemaloteria.sorteo.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.konex.sistemaloteria.billete.model.Billete;
+import org.konex.sistemaloteria.billete.repository.BilleteRepository;
+import org.konex.sistemaloteria.compartido.EstadoBillete;
 import org.konex.sistemaloteria.sorteo.dto.SorteoDto;
 import org.konex.sistemaloteria.sorteo.model.Sorteo;
 import org.konex.sistemaloteria.sorteo.repository.SorteoRepository;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
+/**
+ * Servicio que implementa la lógica de negocio relacionada con los sorteos.
+ *
+ * <p>
+ * Encargado de:
+ * <ul>
+ *   <li>Crear nuevos sorteos.</li>
+ *   <li>Listar sorteos existentes.</li>
+ *   <li>Generar los billetes asociados a un sorteo.</li>
+ *   <li>Consultar los billetes de un sorteo específico.</li>
+ * </ul>
+ *
+ * <p>
+ * Este servicio forma parte del módulo de backend definido en la
+ * <b>Prueba Técnica - Sistema de Ventas de Lotería</b> de Konex Innovation:contentReference[oaicite:1]{index=1}.
+ * </p>
+ */
 @Service
 @RequiredArgsConstructor
 public class SorteoServiceImpl implements SorteoService {
 
-    private final SorteoRepository repository;
+    /** Repositorio para operaciones CRUD sobre la entidad {@link Sorteo}. */
+    private final SorteoRepository sorteoRepository;
 
+    /** Repositorio para la persistencia de billetes asociados a los sorteos. */
+    private final BilleteRepository billeteRepository;
+
+    /** Mapper usado para convertir entre entidades y DTOs. */
+    private final ModelMapper mapper;
+
+    /**
+     * Crea un nuevo sorteo a partir de un DTO recibido.
+     *
+     * @param dto objeto con los datos del sorteo (nombre y fecha).
+     * @return un {@link SorteoDto} con la información del sorteo guardado.
+     */
     @Override
     public SorteoDto crear(SorteoDto dto) {
-        // Validar que los datos del DTO sean correctos
-        if (dto.getNombre() == null || dto.getNombre().isBlank()) {
-            throw new IllegalArgumentException("El nombre del sorteo es obligatorio.");
-        }
-        if (dto.getFechaSorteo() == null) {
-            throw new IllegalArgumentException("La fecha del sorteo es obligatoria.");
-        }
-
-        // Crear la entidad usando Lombok Builder
-        Sorteo sorteo = Sorteo.builder()
-                .nombre(dto.getNombre())
-                .fechaSorteo(dto.getFechaSorteo())
-                .build();
-
-        // Guardar en base de datos
-        Sorteo guardado = repository.save(sorteo);
-
-        // Convertir a DTO para devolverlo
-        return convertirADto(guardado);
+        Sorteo sorteo = mapper.map(dto, Sorteo.class);
+        sorteo = sorteoRepository.save(sorteo);
+        return mapper.map(sorteo, SorteoDto.class);
     }
 
+    /**
+     * Lista todos los sorteos registrados en la base de datos.
+     *
+     * @return una lista de objetos {@link SorteoDto}.
+     */
     @Override
     public List<SorteoDto> listar() {
-        return repository.findAll()
-                .stream()
-                .map(this::convertirADto)
-                .collect(Collectors.toList());
+        return sorteoRepository.findAll().stream()
+                .map(s -> mapper.map(s, SorteoDto.class))
+                .toList();
     }
 
+    /**
+     * Genera un conjunto de billetes para un sorteo específico.
+     *
+     * <p>
+     * Cada billete se numera secuencialmente (por ejemplo, 0001, 0002...),
+     * se marca como <b>DISPONIBLE</b> y se asocia al sorteo indicado.
+     * </p>
+     *
+     * @param sorteoId identificador del sorteo al cual se agregarán los billetes.
+     * @param cantidad cantidad total de billetes a generar.
+     * @param precio valor unitario de cada billete.
+     * @return lista de {@link Billete} creados y persistidos.
+     * @throws RuntimeException si el sorteo no existe.
+     */
+    @Override
+    public List<Billete> generarBilletes(Long sorteoId, int cantidad, double precio) {
+        Sorteo sorteo = sorteoRepository.findById(sorteoId)
+                .orElseThrow(() -> new RuntimeException("Sorteo no encontrado con ID: " + sorteoId));
 
-    private SorteoDto convertirADto(Sorteo sorteo) {
-        SorteoDto dto = new SorteoDto();
-        dto.setId(sorteo.getId());
-        dto.setNombre(sorteo.getNombre());
-        dto.setFechaSorteo(sorteo.getFechaSorteo());
-        return dto;
+        List<Billete> billetes = new ArrayList<>();
+
+        for (int i = 1; i <= cantidad; i++) {
+            Billete billete = new Billete();
+            billete.setNumero(String.format("%04d", i));
+            billete.setPrecio(BigDecimal.valueOf(precio));
+            billete.setEstado(EstadoBillete.DISPONIBLE);
+            billete.setSorteo(sorteo);
+            billetes.add(billeteRepository.save(billete));
+        }
+
+        return billetes;
+    }
+
+    /**
+     * Obtiene todos los billetes registrados para un sorteo dado.
+     *
+     * @param sorteoId identificador del sorteo.
+     * @return lista de billetes asociados al sorteo.
+     */
+    @Override
+    public List<Billete> listarBilletesPorSorteo(Long sorteoId) {
+        return billeteRepository.findBySorteoId(sorteoId);
     }
 }
