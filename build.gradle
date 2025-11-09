@@ -36,10 +36,22 @@ dependencies {
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'com.h2database:h2'
     annotationProcessor 'org.projectlombok:lombok'
+
+    // --- TEST ---
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // Asegura JUnit 5 en el classpath del IDE
+    testImplementation 'org.junit.jupiter:junit-jupiter-api'
+    testRuntimeOnly  'org.junit.jupiter:junit-jupiter-engine'
+
+    // Útil para correr desde el IDE
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Mockito inline para mocks de clases finales si lo necesitas
+    testImplementation 'org.mockito:mockito-inline:5.2.0'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
 }
+
