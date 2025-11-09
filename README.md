@@ -27,62 +27,62 @@ Cobertura de pruebas superior al 95 %
 
 src/
 ├── main/
-│   ├── java/org/konex/sistemaloteria/
-│   │   ├── billete/
-│   │   │   ├── controller/  -> BilleteController.java
-│   │   │   ├── dto/         -> BilleteDto.java
-│   │   │   ├── model/       -> Billete.java
-│   │   │   ├── repository/  -> BilleteRepository.java
-│   │   │   └── service/     -> BilleteService.java, BilleteServiceImpl.java
-│   │   │
-│   │   ├── cliente/
-│   │   │   ├── controller/  -> ClienteController.java
-│   │   │   ├── dto/         -> ClienteDto.java, HistorialClienteDto.java
-│   │   │   ├── model/       -> Cliente.java
-│   │   │   ├── repository/  -> ClienteRepository.java
-│   │   │   └── service/     -> ClienteService.java, ClienteServiceImpl.java
-│   │   │
-│   │   ├── sorteo/
-│   │   │   ├── controller/  -> SorteoController.java
-│   │   │   ├── dto/         -> SorteoDto.java
-│   │   │   ├── model/       -> Sorteo.java
-│   │   │   ├── repository/  -> SorteoRepository.java
-│   │   │   └── service/     -> SorteoService.java, SorteoServiceImpl.java
-│   │   │
-│   │   ├── venta/
-│   │   │   ├── controller/  -> VentaController.java
-│   │   │   ├── dto/         -> VentaRequestDto.java, VentaResponseDto.java
-│   │   │   ├── model/       -> Venta.java
-│   │   │   ├── repository/  -> VentaRepository.java
-│   │   │   └── service/     -> VentaService.java, VentaServiceImpl.java
-│   │   │
-│   │   ├── excepciones/     -> GlobalExceptionHandler.java
-│   │   ├── compartido/      -> EstadoBillete.java
-│   │   ├── configuracion/   -> SecurityConfig.java, MapperConfig.java, StatusController.java
-│   │   └── SistemaLoteriaApplication.java
-│   │
-│   └── resources/
-│       ├── application.properties
-│       ├── data.sql
-│       ├── static/
-│       └── templates/
+│ ├── java/org/konex/sistemaloteria/
+│ │ ├── billete/
+│ │ │ ├── controller/ → BilleteController.java
+│ │ │ ├── dto/ → BilleteDto.java
+│ │ │ ├── model/ → Billete.java
+│ │ │ ├── repository/ → BilleteRepository.java
+│ │ │ └── service/ → BilleteService.java, BilleteServiceImpl.java
+│ │ │
+│ │ ├── cliente/
+│ │ │ ├── controller/ → ClienteController.java
+│ │ │ ├── dto/ → ClienteDto.java, HistorialClienteDto.java
+│ │ │ ├── model/ → Cliente.java
+│ │ │ ├── repository/ → ClienteRepository.java
+│ │ │ └── service/ → ClienteService.java, ClienteServiceImpl.java
+│ │ │
+│ │ ├── sorteo/
+│ │ │ ├── controller/ → SorteoController.java
+│ │ │ ├── dto/ → SorteoDto.java
+│ │ │ ├── model/ → Sorteo.java
+│ │ │ ├── repository/ → SorteoRepository.java
+│ │ │ └── service/ → SorteoService.java, SorteoServiceImpl.java
+│ │ │
+│ │ ├── venta/
+│ │ │ ├── controller/ → VentaController.java
+│ │ │ ├── dto/ → VentaRequestDto.java, VentaResponseDto.java
+│ │ │ ├── model/ → Venta.java
+│ │ │ ├── repository/ → VentaRepository.java
+│ │ │ └── service/ → VentaService.java, VentaServiceImpl.java
+│ │ │
+│ │ ├── excepciones/ → GlobalExceptionHandler.java
+│ │ ├── compartido/ → EstadoBillete.java
+│ │ ├── configuracion/ → SecurityConfig.java, MapperConfig.java, StatusController.java
+│ │ └── SistemaLoteriaApplication.java
+│ │
+│ └── resources/
+│ ├── application.properties
+│ ├── data.sql
+│ ├── static/
+│ └── templates/
 │
 └── test/java/org/konex/sistemaloteria/
-    ├── billete/
-    │   ├── controller/ -> BilleteControllerTest.java
-    │   └── service/    -> BilleteServiceImplTest.java
-    │
-    ├── cliente/
-    │   ├── controller/ -> ClienteControllerTest.java
-    │   └── service/    -> ClienteServiceTest.java
-    │
-    ├── sorteo/
-    │   ├── controller/ -> SorteoControllerTest.java
-    │   └── service/    -> SorteoServiceImplTest.java
-    │
-    └── venta/
-        ├── controller/ -> VentaControllerTest.java
-        └── service/    -> VentaServiceImplTest.java
+├── billete/
+│ ├── controller/ → BilleteControllerTest.java
+│ └── service/ → BilleteServiceImplTest.java
+│
+├── cliente/
+│ ├── controller/ → ClienteControllerTest.java
+│ └── service/ → ClienteServiceTest.java
+│
+├── sorteo/
+│ ├── controller/ → SorteoControllerTest.java
+│ └── service/ → SorteoServiceImplTest.java
+│
+└── venta/
+├── controller/ → VentaControllerTest.java
+└── service/ → VentaServiceImplTest.java
 
 
 ⚙️ Tecnologías utilizadas
