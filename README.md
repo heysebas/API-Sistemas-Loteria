@@ -25,6 +25,8 @@ Cobertura de pruebas superior al 95 %
 
 🗂️ Estructura del proyecto
 
+```bash
+
 src/
 ├── main/
 │ ├── java/org/konex/sistemaloteria/
