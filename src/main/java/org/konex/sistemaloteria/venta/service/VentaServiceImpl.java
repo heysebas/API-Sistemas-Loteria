@@ -15,51 +15,63 @@ import org.konex.sistemaloteria.venta.model.Venta;
 import org.konex.sistemaloteria.venta.repository.VentaRepository;
 
 import java.time.LocalDateTime;
-import java.util.NoSuchElementException;
 
+/**
+ * Servicio encargado de gestionar el proceso de venta de billetes.
+ *
+ * <p>
+ * Estrategia implementada:
+ * 1️⃣ Se validan y cargan las entidades (billete y cliente).<br>
+ * 2️⃣ Se crea la venta y se guarda en la base de datos.<br>
+ * 3️⃣ Si la venta se guarda correctamente, se marca el billete como VENDIDO
+ *     y se le asigna el cliente correspondiente.<br>
+ * 4️⃣ Se retorna una respuesta detallada con toda la información de la venta.
+ * </p>
+ */
 @Service
 @RequiredArgsConstructor
 public class VentaServiceImpl implements VentaService {
 
     private final BilleteRepository billeteRepo;
     private final ClienteRepository clienteRepo;
-    private final VentaRepository   ventaRepo;
+    private final VentaRepository ventaRepo;
 
     /**
-     * Estrategia para que el test "no muta estado" pase:
-     * 1) Validamos y obtenemos entidades.
-     * 2) Guardamos la Venta.
-     * 3) Si lo anterior NO falla, recién ahí marcamos el billete como VENDIDO y lo persistimos.
-     *    (Así, si sale excepción al guardar venta, el billete queda DISPONIBLE).
+     * Registra una nueva venta de billete.
+     *
+     * @param req datos de la venta (sorteoId, billeteId, clienteId)
+     * @return DTO con los datos resultantes de la operación
      */
     @Override
     @Transactional
     public VentaResponseDto vender(VentaRequestDto req) {
-        // --- 1) Cargar y validar entidades ---
+
+        // --- 1️⃣ Validar y obtener entidades ---
         Billete billete = billeteRepo.findById(req.getBilleteId())
-                .orElseThrow(() -> new IllegalArgumentException("Billete no existe"));
+                .orElseThrow(() -> new IllegalArgumentException("Billete no existe con ID: " + req.getBilleteId()));
 
         if (billete.getEstado() != EstadoBillete.DISPONIBLE) {
-            throw new IllegalStateException("El billete ya fue vendido");
+            throw new IllegalStateException("El billete ya fue vendido o no está disponible");
         }
 
         Cliente cliente = clienteRepo.findById(req.getClienteId())
-                .orElseThrow(() -> new IllegalArgumentException("Cliente no existe"));
+                .orElseThrow(() -> new IllegalArgumentException("Cliente no existe con ID: " + req.getClienteId()));
 
-        // --- 2) Crear y guardar la venta (primero la venta) ---
+        // --- 2️⃣ Crear la venta y guardarla ---
         Venta venta = new Venta();
         venta.setBillete(billete);
         venta.setCliente(cliente);
         venta.setFechaVenta(LocalDateTime.now());
         venta.setPrecio(billete.getPrecio());
 
-        Venta guardada = ventaRepo.save(venta); // <- si falla aquí, todavía NO cambiamos el estado
+        Venta guardada = ventaRepo.save(venta);
 
-        // --- 3) Marcar billete vendido y persistir ---
+        // --- 3️⃣ Marcar billete como vendido y asignar cliente ---
+        billete.setCliente(cliente);
         billete.setEstado(EstadoBillete.VENDIDO);
         billeteRepo.save(billete);
 
-        // --- 4) Mapear respuesta ---
+        // --- 4️⃣ Mapear respuesta ---
         return new VentaResponseDto(
                 guardada.getId(),
                 billete.getId(),

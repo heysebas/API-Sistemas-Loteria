@@ -3,6 +3,7 @@ package org.konex.sistemaloteria.sorteo.service;
 import lombok.RequiredArgsConstructor;
 import org.konex.sistemaloteria.billete.model.Billete;
 import org.konex.sistemaloteria.billete.repository.BilleteRepository;
+import org.konex.sistemaloteria.cliente.dto.ClienteDto;
 import org.konex.sistemaloteria.compartido.EstadoBillete;
 import org.konex.sistemaloteria.sorteo.dto.SorteoDto;
 import org.konex.sistemaloteria.sorteo.model.Sorteo;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Servicio que implementa la lógica de negocio relacionada con los sorteos.
@@ -23,12 +25,12 @@ import java.util.List;
  *   <li>Crear nuevos sorteos.</li>
  *   <li>Listar sorteos existentes.</li>
  *   <li>Generar los billetes asociados a un sorteo.</li>
- *   <li>Consultar los billetes de un sorteo específico.</li>
+ *   <li>Consultar los billetes de un sorteo específico, incluyendo el cliente comprador.</li>
  * </ul>
  *
  * <p>
  * Este servicio forma parte del módulo de backend definido en la
- * <b>Prueba Técnica - Sistema de Ventas de Lotería</b> de Konex Innovation:contentReference[oaicite:1]{index=1}.
+ * <b>Prueba Técnica - Sistema de Ventas de Lotería</b> de Konex Innovation.
  * </p>
  */
 @Service
@@ -66,7 +68,7 @@ public class SorteoServiceImpl implements SorteoService {
     public List<SorteoDto> listar() {
         return sorteoRepository.findAll().stream()
                 .map(s -> mapper.map(s, SorteoDto.class))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     /**
@@ -103,13 +105,25 @@ public class SorteoServiceImpl implements SorteoService {
     }
 
     /**
-     * Obtiene todos los billetes registrados para un sorteo dado.
+     * Obtiene todos los billetes registrados para un sorteo dado,
+     * incluyendo la información básica del cliente comprador si existe.
      *
      * @param sorteoId identificador del sorteo.
-     * @return lista de billetes asociados al sorteo.
+     * @return lista de billetes asociados al sorteo, con cliente (si aplica).
      */
     @Override
     public List<Billete> listarBilletesPorSorteo(Long sorteoId) {
-        return billeteRepository.findBySorteoId(sorteoId);
+        List<Billete> billetes = billeteRepository.findBySorteoId(sorteoId);
+
+        // 🔹 Enriquecer manualmente con los datos del cliente (nombre y correo)
+        for (Billete b : billetes) {
+            if (b.getCliente() != null) {
+                // Forzar carga de cliente si es proxy (por Lazy Fetch)
+                b.getCliente().getNombre();
+                b.getCliente().getCorreo();
+            }
+        }
+
+        return billetes;
     }
 }
